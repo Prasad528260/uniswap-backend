@@ -1,24 +1,22 @@
 import express from "express";
-import connectDB from "./config/db.js";
+import connectDB from "./src/config/db.js";
 import cors from "cors";
-import authRouter from "./routes/authRouter.js";
-import profileRouter from "./routes/profileRouter.js";
-import requestRouter from "./routes/requestRouter.js";
-import bookRouter from "./routes/bookRouter.js";
-import orderRouter from "./routes/orderRouter.js";
+import authRouter from "./src/routes/authRouter.js";
+import profileRouter from "./src/routes/profileRouter.js";
+import requestRouter from "./src/routes/requestRouter.js";
+import bookRouter from "./src/routes/bookRouter.js";
+import orderRouter from "./src/routes/orderRouter.js";
 import cookieParser from "cookie-parser";
-import path from 'path';
 import dotenv from "dotenv";
 dotenv.config();
 
 
 const app = express();
-const __dirname = path.resolve();
 app.use(express.json());
 app.use(cookieParser())
 app.use(
   cors({
-    origin: process.env.BASE_URL || "http://localhost:5173",
+    origin: process.env.BASE_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -30,12 +28,6 @@ app.use("/request", requestRouter);
 app.use("/book", bookRouter);
 app.use("/order", orderRouter);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  app.get(/(.*)/,(req,res)=>{
-    res.sendFile(path.join(__dirname,"../frontend","dist","index.html"));
-  })
-}
 
 const PORT = process.env.PORT || 5000;
 connectDB()

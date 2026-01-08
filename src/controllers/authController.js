@@ -1,8 +1,10 @@
 import { validateSignup } from "../utils/validate.js";
 import User from "../models/user.js";
 import { userAuth } from "../middlewares/userAuth.js";
-
+import dotenv from "dotenv";
+dotenv.config();
 import bcrypt from "bcrypt";
+const isProd = process.env.NODE_ENV === "production";
 
 // * Signup
 export const signupController = async (req, res, next) => {
@@ -56,6 +58,9 @@ export const loginController = async (req, res, next) => {
       const token = await user.getJWT();
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000),
+        httpOnly: true,
+        secure: isProd,
+        sameSite: "none",
       });
       res.json(user);
     }
@@ -71,6 +76,9 @@ export const logoutController = (req, res, next) => {
   // cookie.clearCookies("token")
   res.cookie("token", null, {
     expires: new Date(Date.now()),
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
   });
   return res.json({ message: "Logout successful" });
 };
